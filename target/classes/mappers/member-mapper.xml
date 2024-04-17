@@ -6,4 +6,43 @@
 <!-- namespace: 해당 mapper 파일의 고유한 별칭 -->
 <mapper namespace="memberMapper">
 	
+	<resultMap type="Member" id="memberResultMap">
+		<result column="USER_ID" property="userId" />
+		<result column="USER_PWD" property="userPwd" />
+		<result column="USER_NAME" property="userName" />
+		<result column="EMAIL" property="email" />
+		<result column="GENDER" property="gender" />
+		<result column="AGE" property="age" />
+		<result column="PHONE" property="phone" />
+		<result column="ADDRESS" property="address" />
+		<result column="ENROLL_DATE" property="enrollDate" />
+		<result column="MODIFY_DATE" property="modifyDate" />
+		<result column="STATUS" property="status" />
+	</resultMap>
+	
+	<!-- 로그인 쿼리문 -->
+	<select id="loginMember" resultMap="memberResultMap">
+		SELECT USER_ID,
+			   USER_PWD,
+			   USER_NAME,
+			   EMAIL,
+			   GENDER,
+			   AGE,
+			   PHONE,
+			   ADDRESS,
+			   ENROLL_DATE,
+			   MODIFY_DATE,
+			   STATUS
+		FROM MEMBER
+		WHERE USER_ID = #{userId} 
+			AND USER_PWD = #{userPwd}
+			AND STATUS = 'Y'
+	</select>
+	
+	<!-- 아이디 중복 체크 -->
+	<select id="idCheck" resultType="_int">
+		SELECT COUNT(*)
+		FROM MEMBER
+		WHERE USER_ID = #{checkId}
+	</select>
 </mapper>
