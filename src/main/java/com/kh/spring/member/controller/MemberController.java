@@ -3,6 +3,7 @@ package com.kh.spring.member.controller;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,9 @@ public class MemberController {
 	@Autowired
 	private MemberService memberService;
 //	private MemberService memberService = new MemberServiceImpl();
+	
+	@Autowired
+	private BCryptPasswordEncoder bcryptPasswordEncoder;
 	/*
 	 * 기존 객체 생성 방식
 	 * 객체 간 결합도가 높아진다(소스코드 수정이 일어날 경우 하나하나 전부 다 바꿔줘야한다)
@@ -101,23 +105,48 @@ public class MemberController {
 	
 	@RequestMapping("login.me")
 	//@RequestParam 생략 가능
-	public String loginMember(Member member, Model model, HttpSession session) {
+	public String loginMember(Member member, Model model, HttpSession session) {	
+		// 암호화 전
+//		Member loginUser = memberService.loginMember(member);
+//		
+//		if(loginUser == null) { // 로그인 실패 => 에러문구를 requestScope에 담고 에러페이지로 forwording
+//			model.addAttribute("errorMsg", "로그인 실패");
+//			
+//			// 에러 페이지 위치: /WEB-INF/views/common/errorPage.jsp
+//			// servlet-context를 참고하자!
+//			return "common/errorPage";
+//			
+//		} else { //로그인 성공 => sessionScope에 로그인 유저 담아서 메인으로 url 재요청
+//			session.setAttribute("loginUser", loginUser);
+//			
+//			return "redirect:/";
+//		}
 		
-		System.out.println("userId = " + member.getUserId());
-		System.out.println("userPwd = " + member.getUserPwd());
+		// 암호화 후
+		// Member member의 id => 사용자가 입력한 아이디
+		// member의 pwd => 사용자가 입력한 pwd(평문)
 		
 		Member loginUser = memberService.loginMember(member);
 		
-		if(loginUser == null) { // 로그인 실패 => 에러문구를 requestScope에 담고 에러페이지로 forwording
-			model.addAttribute("errorMsg", "로그인 실패");
-			
-			// 에러 페이지 위치: /WEB-INF/views/common/errorPage.jsp
-			// servlet-context를 참고하자!
+		// loginUser의 id => 아이디로 db에서 검색해온 id
+		// loginUser Pwd => db에 기록된 암호화된 비밀번호
+		
+		// bcryptPasswordEncoder 객체의 matches() 이용
+		// matchs(평문, 암호문)을 작성하면 내부적으로 복호화 작업 후 비교가 이루어짐
+		// 두 구문이 일치하면 true, 일치하지 않으면 false
+		bcryptPasswordEncoder.matches(member.getUserPwd(), loginUser.getUserPwd());
+		
+		if(loginUser == null) { // 아이디가 없는 경우
+			model.addAttribute("errorMsg","일치하는 아이디가 없습니다.");
 			return "common/errorPage";
+		} else if (!bcryptPasswordEncoder.matches(member.getUserPwd(), loginUser.getUserPwd())) {
+			// 비밀번호가 다른 경우
+			model.addAttribute("errorMsg","비밀번호가 일치하지 않습니다..");
+			return "common/errorPage";
+		} else {
+			// 아이디, 비밀번호 일치 => 성공
 			
-		} else { //로그인 성공 => sessionScope에 로그인 유저 담아서 메인으로 url 재요청
 			session.setAttribute("loginUser", loginUser);
-			
 			return "redirect:/";
 		}
 
@@ -181,14 +210,82 @@ public class MemberController {
 	}
 	
 	@RequestMapping("insert.me")
-	public String insertMember(Member member) {
+	public String insertMember(Member member, HttpSession session, Model model) {
 		/*
 		 * 1. 한글깨짐문제 발생 => web.xml에 스프링에서 제공하는 인코딩 필터 등록
 		 * 2. 나이를 입력하지 않을 경우 int 자료형에 빈문자열을 대입해야하는 경우가 발생한다.
 		 * => 400 에러 발생 Member의 age필드 자료형을 String으로 변경해주면 된다.
+		 * 3. 비밀번호가 사용자 입력이 그대로 전달이 된다
+		 * Bcrypt 방식을 이용해서 암호화를 한 후 저장을 하겠다.
+		 * => 스프링 시큐리티에서 제공하는 모듈을 이용하자.
+		 * => <pom.xml에 라이브러리 추가> 
 		 */
 		
-		System.out.println(member);
-		return "main";
+		//암호화 작업
+		String encPwd = bcryptPasswordEncoder.encode(member.getUserPwd());
+		
+		member.setUserPwd(encPwd);
+		
+
+		int result = memberService.insertMember(member);
+		
+		if(result > 0) {
+			session.setAttribute("alertMsg", "성공적으로 회원가입이 완료되었습니다.");
+			return "redirect:/";
+		} else {
+			model.addAttribute("errorMsg","회원가입 실패");
+			return "common/errorPage";
+		}
+		
+	}
+	
+	@RequestMapping("myPage.me")
+	public String myPage() {
+		return "member/myPage";	
+	}
+	
+	@RequestMapping("update.me")
+	public String updateMember(Member member, HttpSession session, Model model) {
+		
+		int result = memberService.updateMember(member);
+		
+		if(result > 0) { 
+			session.setAttribute("loginUser", memberService.loginMember(member));
+			session.setAttribute("alertMsg", "회원정보 수정 성공");
+			return "redirect:/myPage.me";
+		} else {
+			model.addAttribute("errorMsg", "회원정보 수정 실패");
+			return "common/errorPage";
+		}
+		
+	}
+	
+	@RequestMapping("delete.me")
+	public String deleteMember(Member member, HttpSession session) {
+		
+		// 1. 암호화된 비밀번호를 가져오자
+		String encPwd =((Member)session.getAttribute("loginUser")).getUserPwd();
+		
+		// 2. 비밀번호가 일치? 불일치?
+		if(bcryptPasswordEncoder.matches(member.getUserPwd(), encPwd)) {
+			int result = memberService.deleteMember(member.getUserId());
+			
+			if(result > 0) {
+				// 3. 일치하면 탈퇴처리 => session에서 제거 -> main페이지로 ㄱㄱ
+				session.removeAttribute("loginUser");
+				session.setAttribute("alertMsg","회원탈퇴가 성공적으로 이루어졌습니다..");
+				return "redirect:/";
+				
+			} else {
+				session.setAttribute("alertMsg","탈퇴처리를 실패하였습니다.");
+				return "redirect:/myPage.me";
+			}
+					
+		} else {
+			// 4. 불일치 시 => alertMsg: 비밀번호 다시 입력 -> myPage
+			session.setAttribute("alertMsg","비밀번호를 다시 입력해주세요");
+			return "redirect:/myPage.me";
+		}
+			
 	}
 }

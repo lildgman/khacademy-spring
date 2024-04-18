@@ -12,7 +12,18 @@ public class MemberDao {
 	}
 
 	public int idCheck(SqlSessionTemplate sqlSession, String checkId) {
-		// TODO Auto-generated method stub
 		return sqlSession.selectOne("memberMapper.idCheck",checkId);
+	}
+
+	public int insertMember(SqlSessionTemplate sqlSession, Member member) {
+		return sqlSession.insert("memberMapper.insertMember", member);
+	}
+
+	public int updateMember(SqlSessionTemplate sqlSession, Member member) {
+		return sqlSession.update("memberMapper.updateMember", member);
+	}
+
+	public int deleteMember(SqlSessionTemplate sqlSession, String userId) {
+		return sqlSession.update("memberMapper.deleteMember",userId);
 	}
 }

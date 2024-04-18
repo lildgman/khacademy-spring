@@ -8,6 +8,7 @@
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
 			/WEB-INF/spring/root-context.xml
+			/WEB-INF/spring/spring-security.xml
 		</param-value>
 	</context-param>
 	
@@ -42,7 +43,9 @@
 	 -->
 	 <filter>
 	 	<filter-name>encodingFilter</filter-name>
-	 	<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+	 	<filter-class>
+	 		org.springframework.web.filter.CharacterEncodingFilter
+	 	</filter-class>
 	 	
 	 	<!-- 옵션1. 인코딩방식 UTF-8 -->
 	 	<init-param>

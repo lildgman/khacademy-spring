@@ -78,7 +78,7 @@
                     //서버에 데이터를 보내서 응답을 받아야한다 -> ajax
                     const str = ev.target.value;
                     if (str.trim().length >= 5) { // 5글자이상
-                        eventFlag = setTimeout(function () { // 1.5초후에 서버로 check요청 전송
+                        eventFlag = setTimeout(function () { 
                             $.ajax({
                                 url: "idCheck.me",
                                 data: { checkId: ev.target.value }, // 체크하고싶은 사용자가 입력한 아이디
