@@ -19,6 +19,7 @@ public class MemberController {
 	private MemberService memberService;
 //	private MemberService memberService = new MemberServiceImpl();
 	
+	//암호화에 필요한 객체
 	@Autowired
 	private BCryptPasswordEncoder bcryptPasswordEncoder;
 	/*
@@ -132,7 +133,7 @@ public class MemberController {
 		// loginUser Pwd => db에 기록된 암호화된 비밀번호
 		
 		// bcryptPasswordEncoder 객체의 matches() 이용
-		// matchs(평문, 암호문)을 작성하면 내부적으로 복호화 작업 후 비교가 이루어짐
+		// matchs(평문, 암호문)을 작성하면 내부적으로 복호화 작업 후 비교
 		// 두 구문이 일치하면 true, 일치하지 않으면 false
 		bcryptPasswordEncoder.matches(member.getUserPwd(), loginUser.getUserPwd());
 		

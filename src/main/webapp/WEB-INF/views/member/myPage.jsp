@@ -50,9 +50,7 @@
               			}
               		})
               	</script>
-              	
-              	
-              	
+              	           	
                 <br>
                 <div class="btns" align="center">
                     <button type="submit" class="btn btn-primary">수정하기</button>
