@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.kh.spring.board.model.dao.BoardDao;
 import com.kh.spring.board.model.vo.Board;
+import com.kh.spring.board.model.vo.Reply;
 import com.kh.spring.common.model.vo.PageInfo;
 
 @Service
@@ -28,8 +29,25 @@ public class BoardServiceImpl implements BoardService{
 
 	@Override
 	public ArrayList<Board> selectBoardList(PageInfo pi) {
-		// TODO Auto-generated method stub
-		return null;
+
+		return boardDao.selectList(sqlSession, pi);
+	}
+
+	@Override
+	public int increaseCount(int bno) {
+		
+		return boardDao.increaseCount(sqlSession, bno);
+	}
+
+	@Override
+	public Board selectBoard(int bno) {
+		return boardDao.selectBoard(sqlSession, bno);
+	}
+
+	@Override
+	public ArrayList<Reply> selectReplyList(int bno) {
+
+		return boardDao.selectReplyList(sqlSession, bno);
 	}
 
 }
