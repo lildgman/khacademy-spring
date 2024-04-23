@@ -37,4 +37,12 @@ public class BoardDao {
 		return (ArrayList)sqlSession.selectList("boardMapper.selectReplyList", bno);
 	}
 
+	public int insertBoard(SqlSessionTemplate sqlSession, Board board) {
+		return sqlSession.insert("boardMapper.insertBoard", board);
+	}
+
+	public int updateBoard(SqlSessionTemplate sqlSession, Board board) {
+		return sqlSession.update("boardMapper.updateBoard", board);
+	}
+
 }

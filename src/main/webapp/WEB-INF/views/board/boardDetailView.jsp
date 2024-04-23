@@ -68,11 +68,34 @@
    			<!-- 수정하기, 삭제하기 버튼은 이 글이 본인이 작성한 글일 경우에만 보여져야 함 -->
             <div align="center">
             	<c:if test="${loginUser.userId eq board.boardWriter }">
-                	<a class="btn btn-primary" onclick="">수정하기</a>
-                	<a class="btn btn-danger" onclick="">삭제하기</a>
+                	<a class="btn btn-primary" onclick="postFormSubmit('edit')">수정하기</a>
+                	<a class="btn btn-danger" onclick="postFormSubmit('delete')">삭제하기</a>
                 </c:if>
             </div>
             <br><br>
+
+            <form action="" method="POST" id="postForm">
+                <input type="hidden" name="bno" value="${board.boardNo}">
+            </form>
+
+            <script>
+                function postFormSubmit(type) {
+                    const formEl = document.querySelector('#postForm');
+                    switch(type) {
+                        case 'edit':{
+                            formEl.action = "updateForm.bo";
+                            // formEl.setAttribute("action", "updateForm.bo");
+                        } break;
+
+                        case 'delete' :{
+                            formEl.action = "delete.bo";
+                            // formEl.setAttribute("action", "delete.bo");
+                        } break;
+                    }
+                    $(formEl).submit();
+                }
+
+            </script>
            
             
              <form action="" method="post" id="postForm">
@@ -111,13 +134,7 @@
 
                 </thead>
                 <tbody>
-                <!--  
-                  <tr>
-                        <th>admin</th>
-                        <td>댓글남깁니다</td>
-                        <td>2022-05-10</td>
-                  </tr>
-                  -->
+
                 </tbody>
             </table>
         </div>

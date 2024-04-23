@@ -23,4 +23,10 @@ public interface BoardService {
 	// 댓글 목록 조회
 	ArrayList<Reply> selectReplyList(int bno);
 
+	// 게시글 추가
+	int insertBoard(Board board);
+
+	// 게시글 수정
+	int updateBoard(Board board);
+
 }
