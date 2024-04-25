@@ -60,4 +60,18 @@ public class BoardServiceImpl implements BoardService{
 		return boardDao.updateBoard(sqlSession, board);
 	}
 
+	@Override
+	public int insertReply(Reply reply) {
+		return boardDao.insertReply(sqlSession, reply);
+	}
+
+	@Override
+	public ArrayList<Board> selectTopBoardList() {
+		return boardDao.selectTopBoardList(sqlSession);
+	}
+
+	
+
+	
+
 }

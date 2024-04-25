@@ -46,9 +46,7 @@
                         	<c:otherwise>
                         		<!-- case2 -->
 								첨부파일이 없습니다.
-                        	</c:otherwise>
-							
-						
+                        	</c:otherwise>					
 						</c:choose>
 							
 		
@@ -140,54 +138,158 @@
         </div>
         <br><br>
         <script>
-            $(function() {
-                getReplyList({bno: ${board.boardNo}}, function(res) {
-                    const replyBody = document.querySelector("#replyArea tbody");
-                    const list = [];
-                    for(let r of res) {
-                        list.push({
-                            tdData1:r.replyWriter,
-                            tdData2:r.replyContent,
-                            tdData3:r.createDate,
-                            rowEvent: function() {
-                                console.log(r);
-                            }
-                        })
-                    }
+            $(function(){
+                getReplyList({bno : ${board.boardNo}}, function(result){
+                    // reulst = reulst.map(r => {
+                    //     return {
+                    //         ...r,
+                    //         cNo : 1
+                    //     }
+                    // })
 
-                    drawTableList(list, replyBody);
+                    // reulst.push({
+                    //     cNo : 2,
+                    //     createDate : "2022-10-30",
+                    //     refBno : 0,
+                    //     replyContent : "안녕하세요",
+                    //     replyNo: 5,
+                    //     replyWriter: "admin"
+                    // });
+
+                    // const rList = {
+                        
+                    // }
+                    // for (let r of reulst) {
+                    //     if (rList[r.cNo]) {
+                    //         rList[r.cNo].push(r);
+                    //     } else {
+                    //         rList[r.cNo] = [r];
+                    //     }
+                    // }
+                    // console.log(rList)
+                    
+                    setReplyCount(result.length)
+
+                    const list = getTdDataFormatToReply(result)
+                    const replyBody = document.querySelector("#replyArea tbody");
+
+                    drawTableList(result, replyBody);
                 })
             })
+            
+            //댓글 등록
+            function addReply(){
+                //boardNo
+                //userId
+                //댓글내용
 
-            function getReplyList(data, callback) {
+                const boardNo = ${board.boardNo};
+                const userId = "${loginUser.userId}";
+                const content = document.querySelector("#content").value;
+
+                addReplyAjax({
+                    refBno: boardNo,
+                    replyWriter: userId,
+                    replyContent: content
+                }, function(res){
+                    getReplyList({bno : ${board.boardNo}}, function(result){
+                        setReplyCount(result.length);
+                        drawTableList(result, document.querySelector("#replyArea tbody"));
+                    })
+                    
+                })
+            }
+
+            //댓글 데이터 포맷변경
+            function getTdDataFormatToReply(replyList){
+                const list = [];
+                for (let r of replyList) {
+                    list.push({ 
+                        tdData1: r.replyWriter,
+                        tdData2: r.replyContent,
+                        tdData3: r.createDate,
+                        rowEvent: function(){
+                            console.log("클릭됨")
+                        }
+                    })
+                }
+
+                return list;
+            }
+            //댓글 카운트 넣기
+            function setReplyCount(count){
+                const rCount = document.querySelector("#rcount");
+                rCount.innerHTML = count;
+            }
+
+            function addReplyAjax(data, callback){
                 $.ajax({
-                    url:'rlist.bo',
+                    url: "rinsert.bo",
                     data : data,
-                    success: function(res) {
+                    success : function(res){
                         callback(res);
-                    },
-
-                    error: function(item) {
-                        console.log(item);
+                    }, error(){
+                        console.log("댓글 생성 ajax실패");
                     }
                 })
             }
 
-            function drawTableList(itemList, parent) {
-                for(let item of itemList) {
-                    const replyRow = document.createElement('tr');
-                    replyRow.innerHTML = `
-                        <th>`+item.tdData1+`</th>
-                        <td>`+item.tdData2+`</td>
-                        <td>`+item.tdData3+`</td>`;
-                    parent.append(replyRow);
+            // 댓글 목록 가져오기
+            function getReplyList(data, callback){
+                $.ajax({
+                    url: 'rlist.bo',
+                    data : data,
+                    success: function(result){
+                        callback(result);
+                    },
+                    error: function(item){
+                        console.log(item);
+                        console.log("댓글요청 ajax 실패");
+                    }
+                })
+            }
 
-                    replyRow.onclick=function() {
+            function drawTableList(itemList, parent){
+                $(parent).empty();
+               
+                //단순하게 보여주기위한 view를 작성할때  
+                // let str = "";                
+                // for (let reply of replyList) {
+                //     str += `<tr>
+                //                 <th>` + reply.replyWriter + `</th>
+                //                 <td>` + reply.replyContent + `</td>
+                //                 <td>` + reply.createDate + `</td>
+                //             </tr>`;
+                // }
+                // replyBody.innerHTML = str;
+
+                //이벤트를 넣는 뷰를 작성하고 싶을 때               
+                for (let reply of itemList) {
+                    const replyRow = document.createElement('tr');
+                    replyRow.innerHTML = `<th>` + reply.replyWriter + `</th>
+                                          <td>` + reply.replyContent + `</td>
+                                          <td>` + reply.createDate + `</td>`;
+                    parent.appendChild(replyRow);
+                    
+                    replyRow.onclick = function(){
                         console.log(reply);
                     }
                 }
-            }
 
+                //ui라이브러리형식으로 구성하기
+                // for (let item of itemList) {
+                //     const row = document.createElement('tr');
+                //     row.innerHTML = `<th>` + item.tdData1 + `</th>
+                //                           <td>` + item.tdData2 + `</td>
+                //                           <td>` + item.tdData3 + `</td>`
+                //     parent.appendChild(row);
+                    
+                //     row.onclick = function(){
+                //         item.rowEvent(item);
+                //     }
+                // }
+               
+            }
         </script>
 
     </div>

@@ -1,5 +1,7 @@
 package com.kh.spring.member.controller;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,7 +108,7 @@ public class MemberController {
 	
 	@RequestMapping("login.me")
 	//@RequestParam 생략 가능
-	public String loginMember(Member member, Model model, HttpSession session) {	
+	public String loginMember(Member member, Model model, String saveId ,HttpSession session, HttpServletResponse response) {	
 		// 암호화 전
 //		Member loginUser = memberService.loginMember(member);
 //		
@@ -146,6 +148,12 @@ public class MemberController {
 			return "common/errorPage";
 		} else {
 			// 아이디, 비밀번호 일치 => 성공
+			Cookie ck = new Cookie("saveId", loginUser.getUserId());
+			if(saveId == null) {
+				ck.setMaxAge(0);
+			}
+			
+			response.addCookie(ck);
 			
 			session.setAttribute("loginUser", loginUser);
 			return "redirect:/";
@@ -217,7 +225,7 @@ public class MemberController {
 		 * 2. 나이를 입력하지 않을 경우 int 자료형에 빈문자열을 대입해야하는 경우가 발생한다.
 		 * => 400 에러 발생 Member의 age필드 자료형을 String으로 변경해주면 된다.
 		 * 3. 비밀번호가 사용자 입력이 그대로 전달이 된다
-		 * Bcrypt 방식을 이용해서 암호화를 한 후 저장을 하겠다.
+		 * Bcrypt 방식을 이용해서 암호화를 한 후 저장 하자
 		 * => 스프링 시큐리티에서 제공하는 모듈을 이용하자.
 		 * => <pom.xml에 라이브러리 추가> 
 		 */

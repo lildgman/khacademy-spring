@@ -93,4 +93,35 @@
 		WHERE BOARD_NO = #{boardNo}
 	</update>
 	
+	<!-- 댓굴 추가 -->
+	<insert id="insertReply">
+		INSERT INTO REPLY (
+			REPLY_NO,
+			REPLY_CONTENT,
+			REF_BNO,
+			REPLY_WRITER
+		) VALUES (
+			SEQ_RNO.NEXTVAL,
+			#{replyContent},
+			#{refBno},
+			#{replyWriter}
+		)
+	</insert>
+	
+	<!-- 상위 조회수 게시물 조회 -->
+	<select id="selectTopBoardList" resultMap="boardResultMap">
+		SELECT A.*
+		FROM (SELECT BOARD_NO,
+						BOARD_TITLE,
+						BOARD_WRITER,
+						ORIGIN_NAME,
+						COUNT,
+						TO_CHAR(CREATE_DATE, 'YYYY-MM-DD') AS "CREATE_DATE"
+				   FROM BOARD
+				  WHERE STATUS = 'Y'
+		          ORDER BY COUNT DESC) A
+		WHERE ROWNUM BETWEEN 1 AND 5
+	</select>
+	
+	
 </mapper>

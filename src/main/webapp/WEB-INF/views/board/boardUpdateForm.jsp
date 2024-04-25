@@ -22,7 +22,7 @@
 
             <form id="updateForm" method="post" action="update.bo" enctype="multipart/form-data">
             	<input type="hidden" name="boardNo" value="${board.boardNo }">
-                <table algin="center">
+                <table align="center">
                     <tr>
                         <th><label for="title">제목</label></th>
                         <td><input type="text" id="title" class="form-control" value="${board.boardTitle }" name="boardTitle" required></td>

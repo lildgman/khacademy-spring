@@ -34,7 +34,7 @@ public class BoardController {
 	public String selectList(@RequestParam(value="cpage", defaultValue="1") int currentPage, Model model) {
 		int boardCount = boardService.selectListCount();
 		
-		PageInfo pi =Pagination.getPageInfo(boardCount, currentPage, 10, 5);
+		PageInfo pi = Pagination.getPageInfo(boardCount, currentPage, 10, 5);
 		ArrayList<Board> list = boardService.selectBoardList(pi);
 		
 		model.addAttribute("list", list);
@@ -184,5 +184,18 @@ public class BoardController {
 			return "common/errorPage";
 		}
 		
+	}
+		
+	@ResponseBody
+	@RequestMapping("rinsert.bo")
+	public String ajaxInsertReply(Reply reply) {
+		//성공했을 때 => success, 실패했을 때 fail
+		return boardService.insertReply(reply) > 0 ? "success" : "fail";		
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="topList.bo", produces="application/json; charset=UTF-8")
+	public String ajaxBoardList() {
+		return new Gson().toJson(boardService.selectTopBoardList());
 	}
 }

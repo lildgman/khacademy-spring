@@ -77,7 +77,7 @@
                 
                 	<c:choose>
                 		<c:when	test="${pi.currentPage eq 1 }">
-                			<li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+                			<li class="page-item disabled"><a class="page-link">Previous</a></li>
                 		</c:when>
                 		<c:otherwise>
                 			<li class="page-item"><a class="page-link" href="list.bo?cpage=${pi.currentPage -1 }">Previous</a></li>
@@ -91,7 +91,7 @@
                     
                     <c:choose>
                     	<c:when test="${pi.currentPage eq pi.maxPage }">
-                    		<li class="page-item disabled"><a class="page-link" href="#">Next</a></li>
+                    		<li class="page-item disabled"><a class="page-link">Next</a></li>
                     	</c:when>
                     	<c:otherwise>
                     		<li class="page-item"><a class="page-link" href="list.bo?cpage=${pi.currentPage +1 }">Next</a></li>

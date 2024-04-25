@@ -29,4 +29,10 @@ public interface BoardService {
 	// 게시글 수정
 	int updateBoard(Board board);
 
+	// 댓글 추가
+	int insertReply(Reply reply);
+
+	// 상위 게시물 가져오기
+	ArrayList<Board> selectTopBoardList();
+
 }

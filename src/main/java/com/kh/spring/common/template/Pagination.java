@@ -4,7 +4,7 @@ import com.kh.spring.common.model.vo.PageInfo;
 
 public class Pagination {
 	/*
-	 * int listCount; // 현재 총 게시글 수
+	 *  int listCount; // 현재 총 게시글 수
 		int currentPage; // 현재 페이지 (사용자가 요청한 페이지)
 		int pageLimit; // 하단에 보여질 페이징바의 페이지 개수
 		int boardLimit; // 한 페이지 내에 보여질 게시글 최대개수
